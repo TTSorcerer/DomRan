@@ -1,12 +1,9 @@
-import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import random
-from time import sleep
-import sys
 
-N_EXPANSIONS = 2
+N_EXPANSIONS = 7 # max 7 (changes with extra expansions)
 EXPANSIONS = ["Alchemy", "Dominion II", "Dark Ages", "Intrigue", "Nocturne", "Prosperity", "Renaissance"]
 
 OPTIONS = {
@@ -19,7 +16,7 @@ OPTIONS = {
     "Distribute Cost": False,
     "3+ Alchemy Cards": False,
 }
-DEFAULT_SELECTIONS = {
+DEFAULT_OPTIONS = {
     "Require +2 Action": True,
     "Require Drawer": False,
     "Require Buy": False,
@@ -29,6 +26,15 @@ DEFAULT_SELECTIONS = {
     "Distribute Cost": False,
     "3+ Alchemy Cards": True,
 }
+DEFAULT_EXPANSIONS = {
+    "Alchemy": False,
+    "Dominion II": True,
+    "Dark Ages": False,
+    "Intrigue": False,
+    "Nocturne": False,
+    "Prosperity": False,
+    "Renaissance": False
+}
 SORT = "Cost" # either "Cost", "Set", or "Alphabetical"
 driver = webdriver.Firefox()
 driver.get("https://dominionrandomizer.com")
@@ -36,15 +42,15 @@ driver.get("https://dominionrandomizer.com")
 sets = random.sample(EXPANSIONS, N_EXPANSIONS)
 boxes = driver.find_elements(by=By.CLASS_NAME, value="checkbox")
 for i in boxes[:18]:
-    if i.text == "Dominion II" or i.text == "Allow Attacks" or i.text == "Require +2 Action" or i.text == "3+ Alchemy Cards":
+    if i.text in DEFAULT_OPTIONS.keys() and DEFAULT_OPTIONS[i.text] != OPTIONS[i.text]:
         i.click()
-    if i.text == sets[0] or i.text == sets[1]:
+    if i.text in sets and not DEFAULT_EXPANSIONS[i.text]:
         i.click()
 boxes = driver.find_elements(by=By.CLASS_NAME, value="checkbox")
 for i in boxes[18:]:
     if i.text == SORT:
         i.click()
-    if (i.text in OPTIONS.keys() and OPTIONS[i.text] != DEFAULT_SELECTIONS[i.text]):
+    if (i.text in OPTIONS.keys() and OPTIONS[i.text] != DEFAULT_OPTIONS[i.text]):
         i.click()
         
 driver.find_element(By.CLASS_NAME, "standard-button").click()
